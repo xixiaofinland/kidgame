@@ -1,4 +1,4 @@
-/* Pottu: toast-linkit + Pottu Dash (endless hyppely). */
+/* Pottu: toast-linkit + mini potato jumpper (endless hyppely). */
 
 const BEST_KEY = "pottu_dash_best_v1";
 const AUDIO_KEY = "pottu_dash_audio_v1";
@@ -286,7 +286,7 @@ function createGame() {
     if (!els.overlay) return;
     els.overlay.classList.remove("hidden");
     if (mode === "ready") {
-      if (els.overlayTitle) els.overlayTitle.textContent = "Pottu Dash";
+      if (els.overlayTitle) els.overlayTitle.textContent = "mini potato jumpper";
       if (els.overlayText) els.overlayText.textContent = "Hyppy: klikkaa / koske / valilyonti (tuplahyppy!)";
       if (els.overlayHint) els.overlayHint.textContent = "Vinkki: korkeat esteet vaatii tuplahypyn.";
     }
@@ -700,14 +700,12 @@ function createGame() {
   }
 
   function bindControls() {
-    const jumpAny = (e) => {
+    const startOrJump = (e) => {
       if (e && typeof e.preventDefault === "function") e.preventDefault();
-      if (!state.running && !state.dead) {
+      if (!state.running) {
+        // Mobile UX: first tap starts AND jumps, so tuplahyppy onnistuu kahdella tapilla.
         startRun();
-        return;
-      }
-      if (state.dead) {
-        startRun();
+        jump();
         return;
       }
       jump();
@@ -716,7 +714,7 @@ function createGame() {
     const onKey = (e) => {
       if (e.code === "Space" || e.code === "ArrowUp") {
         e.preventDefault();
-        jumpAny(e);
+        startOrJump(e);
       }
       if (e.code === "KeyR") {
         if (state.dead) startRun();
@@ -725,17 +723,24 @@ function createGame() {
 
     window.addEventListener("keydown", onKey, { passive: false });
 
-    canvas.addEventListener("pointerdown", jumpAny, { passive: false });
-    canvas.addEventListener(
-      "touchstart",
-      (e) => {
-        e.preventDefault();
-        jumpAny(e);
-      },
-      { passive: false }
-    );
+    // Prefer Pointer Events (covers touch + mouse). Fallback if not supported.
+    if (window.PointerEvent) {
+      canvas.addEventListener("pointerdown", startOrJump, { passive: false });
+    } else {
+      canvas.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          startOrJump(e);
+        },
+        { passive: false }
+      );
+      canvas.addEventListener("mousedown", startOrJump);
+    }
 
-    if (els.jumpBtn) els.jumpBtn.addEventListener("click", jumpAny);
+    if (els.jumpBtn) els.jumpBtn.addEventListener("click", startOrJump);
+
+    // Buttons should start without forcing a jump.
     if (els.startBtn) els.startBtn.addEventListener("click", () => startRun());
     if (els.restartBtn) els.restartBtn.addEventListener("click", () => startRun());
 
@@ -770,7 +775,7 @@ function createGame() {
     if (els.overlay) {
       els.overlay.addEventListener("pointerdown", (e) => {
         if (e.target && e.target.closest && e.target.closest("button")) return;
-        jumpAny(e);
+        startOrJump(e);
       });
     }
   }
