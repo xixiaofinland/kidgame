@@ -27,9 +27,12 @@ html, body { height: 100%; }
 body {
   margin: 0;
   color: var(--text);
-  background: radial-gradient(1100px 680px at 20% 15%, rgba(92, 214, 255, 0.14), transparent 62%),
-    radial-gradient(900px 620px at 85% 35%, rgba(124, 242, 154, 0.12), transparent 55%),
-    linear-gradient(180deg, var(--bg0), var(--bg1));
+  background-color: #05040b;
+  background-image: url("assets/end-bg.svg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
   font-family: var(--font-body);
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
@@ -46,18 +49,26 @@ code {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.8;
+  opacity: 0.95;
   background-image:
-    linear-gradient(rgba(233, 246, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(233, 246, 255, 0.06) 1px, transparent 1px);
-  background-size: 18px 18px;
-  mask-image: radial-gradient(ellipse at 50% 20%, black 45%, transparent 75%);
+    radial-gradient(1200px 700px at 50% 18%, transparent 45%, rgba(0, 0, 0, 0.42) 100%),
+    radial-gradient(900px 520px at 30% 12%, rgba(208, 65, 255, 0.10), transparent 60%),
+    radial-gradient(900px 520px at 78% 24%, rgba(122, 44, 255, 0.08), transparent 62%);
+  mask-image: radial-gradient(ellipse at 50% 18%, black 60%, transparent 88%);
+}
+
+@media (min-width: 900px) {
+  body {
+    background-attachment: fixed;
+  }
 }
 
 .wrap {
   width: min(880px, calc(100% - 36px));
   margin: 0 auto;
   padding: 26px 0 44px;
+  position: relative;
+  z-index: 1;
 }
 
 .hero {

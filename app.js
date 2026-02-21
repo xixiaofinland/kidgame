@@ -74,6 +74,25 @@ function createGame() {
   const canvas = els.canvas;
   const ctx = canvas.getContext("2d", { alpha: false });
 
+  const netherBg = new Image();
+  let netherBgReady = false;
+  let renderBgCacheFn = null;
+  netherBg.decoding = "async";
+  netherBg.src = "assets/nether-bg.svg";
+  netherBg.addEventListener("load", () => {
+    netherBgReady = true;
+    if (renderBgCacheFn) renderBgCacheFn();
+  });
+  netherBg.addEventListener("error", () => {
+    netherBgReady = false;
+    if (renderBgCacheFn) renderBgCacheFn();
+  });
+
+  // Cache background into an offscreen canvas for mobile performance.
+  const bgCache = document.createElement("canvas");
+  const bgCtx = bgCache.getContext("2d", { alpha: false });
+  let bgCacheReady = false;
+
   const state = {
     running: false,
     dead: false,
@@ -325,7 +344,53 @@ function createGame() {
 
     player.x = Math.floor(state.w * 0.18);
     player.y = state.floorY - player.h;
+
+    renderBgCacheFn();
   }
+
+  renderBgCacheFn = function renderBgCache() {
+    const w = state.w;
+    const h = state.h;
+    if (w <= 2 || h <= 2) {
+      bgCacheReady = false;
+      return;
+    }
+
+    bgCache.width = w;
+    bgCache.height = h;
+
+    // Base fill
+    bgCtx.fillStyle = "#090108";
+    bgCtx.fillRect(0, 0, w, h);
+
+    if (netherBgReady) {
+      const iw = netherBg.naturalWidth || 1920;
+      const ih = netherBg.naturalHeight || 1080;
+      const scale = Math.max(w / iw, h / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
+      bgCtx.drawImage(netherBg, dx, dy, dw, dh);
+      bgCacheReady = true;
+    } else {
+      // Fallback nether gradient.
+      const g = bgCtx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, "#24040a");
+      g.addColorStop(0.65, "#0f0208");
+      g.addColorStop(1, "#06010a");
+      bgCtx.fillStyle = g;
+      bgCtx.fillRect(0, 0, w, h);
+      bgCacheReady = true;
+    }
+
+    // Vignette
+    const vg = bgCtx.createRadialGradient(w * 0.5, h * 0.25, Math.min(w, h) * 0.12, w * 0.5, h * 0.35, Math.max(w, h) * 0.9);
+    vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(1, "rgba(0,0,0,0.38)");
+    bgCtx.fillStyle = vg;
+    bgCtx.fillRect(0, 0, w, h);
+  };
 
   function resetRun() {
     state.running = false;
@@ -559,39 +624,26 @@ function createGame() {
   function drawBackground() {
     const w = state.w;
     const h = state.h;
-    const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, "#060813");
-    g.addColorStop(1, "#0b1020");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-
     const t = state.t;
-    const y0 = Math.floor(h * 0.18);
-    const amp = Math.floor(h * 0.06);
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = "#5dd6ff";
-    ctx.beginPath();
-    ctx.moveTo(0, y0);
-    for (let x = 0; x <= w; x += 22) {
-      const y = y0 + Math.sin((x * 0.012) + t * 1.1) * amp;
-      ctx.lineTo(x, y);
-    }
-    ctx.lineTo(w, 0);
-    ctx.lineTo(0, 0);
-    ctx.closePath();
-    ctx.fill();
-    ctx.globalAlpha = 1;
 
-    ctx.globalAlpha = 0.10;
-    ctx.strokeStyle = "#e9f6ff";
-    ctx.lineWidth = 1;
-    const step = 22;
-    const off = -((t * 60) % step);
-    for (let x = off; x < w; x += step) {
+    if (bgCacheReady) {
+      ctx.drawImage(bgCache, 0, 0);
+    } else {
+      ctx.fillStyle = "#090108";
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // Floating embers.
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = "#ffb14a";
+    const count = 18;
+    for (let i = 0; i < count; i += 1) {
+      const px = (i * 137 + (t * 42)) % (w + 80) - 40;
+      const py = ((i * 89 + (t * 28)) % (h * 0.72)) + 18;
+      const r = 1.4 + (i % 3) * 0.55;
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-      ctx.stroke();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
@@ -690,11 +742,27 @@ function createGame() {
   }
 
   let last = 0;
+  let acc = 0;
+  const FIXED_DT = 1 / 60;
   function frame(ts) {
     if (!last) last = ts;
-    const dt = Math.min(0.033, (ts - last) / 1000);
+    let dt = (ts - last) / 1000;
     last = ts;
-    update(dt);
+
+    // Clamp huge delays (tab background, etc.)
+    if (!Number.isFinite(dt) || dt < 0) dt = 0;
+    dt = Math.min(0.25, dt);
+    acc += dt;
+
+    // Fixed-step update so the game doesn't "slow down" on low FPS.
+    let steps = 0;
+    while (acc >= FIXED_DT && steps < 8) {
+      update(FIXED_DT);
+      acc -= FIXED_DT;
+      steps += 1;
+    }
+    if (steps >= 8) acc = 0;
+
     draw();
     requestAnimationFrame(frame);
   }

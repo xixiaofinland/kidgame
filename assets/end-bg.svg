@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0614"/>
+      <stop offset="0.55" stop-color="#05040b"/>
+      <stop offset="1" stop-color="#03020a"/>
+    </linearGradient>
+
+    <radialGradient id="neb" cx="50%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#7a2cff" stop-opacity="0.28"/>
+      <stop offset="0.45" stop-color="#4b1ab8" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="neb2" cx="72%" cy="30%" r="60%">
+      <stop offset="0" stop-color="#d041ff" stop-opacity="0.22"/>
+      <stop offset="0.48" stop-color="#7a2cff" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <pattern id="endstone" width="96" height="96" patternUnits="userSpaceOnUse">
+      <rect width="96" height="96" fill="#e6df8f" fill-opacity="0.08"/>
+      <path d="M0 0H96V96H0Z" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="2"/>
+      <path d="M0 48H96M48 0V96" stroke="#000000" stroke-opacity="0.10" stroke-width="2"/>
+      <path d="M10 18h18v14H10zM58 12h26v20H58zM16 62h24v22H16zM60 60h22v26H60z" fill="#000000" fill-opacity="0.10"/>
+      <path d="M12 22h6v4h-6zM22 16h4v6h-4zM66 18h6v4h-6zM78 26h4v6h-4zM20 74h6v4h-6zM34 80h4v6h-4zM70 72h6v4h-6zM80 66h4v6h-4z" fill="#2a1a3a" fill-opacity="0.18"/>
+    </pattern>
+
+    <pattern id="stars" width="220" height="220" patternUnits="userSpaceOnUse">
+      <circle cx="18" cy="24" r="1.2" fill="#f5f1ff" fill-opacity="0.55"/>
+      <circle cx="120" cy="34" r="1" fill="#f5f1ff" fill-opacity="0.45"/>
+      <circle cx="198" cy="66" r="1.4" fill="#f5f1ff" fill-opacity="0.60"/>
+      <circle cx="44" cy="118" r="1.1" fill="#f5f1ff" fill-opacity="0.45"/>
+      <circle cx="164" cy="142" r="1.2" fill="#f5f1ff" fill-opacity="0.50"/>
+      <circle cx="86" cy="188" r="1.0" fill="#f5f1ff" fill-opacity="0.40"/>
+      <circle cx="208" cy="202" r="1.1" fill="#f5f1ff" fill-opacity="0.42"/>
+      <circle cx="24" cy="206" r="1.4" fill="#f5f1ff" fill-opacity="0.55"/>
+    </pattern>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <rect width="1920" height="1080" fill="url(#neb)"/>
+  <rect width="1920" height="1080" fill="url(#neb2)"/>
+  <rect width="1920" height="1080" fill="url(#stars)"/>
+
+  <!-- Subtle portal particles -->
+  <g fill="#d041ff" fill-opacity="0.25">
+    <circle cx="380" cy="220" r="2"/>
+    <circle cx="520" cy="310" r="1.6"/>
+    <circle cx="820" cy="260" r="2.1"/>
+    <circle cx="1060" cy="190" r="1.7"/>
+    <circle cx="1240" cy="320" r="2.0"/>
+    <circle cx="1460" cy="240" r="1.8"/>
+    <circle cx="1580" cy="340" r="2.2"/>
+  </g>
+
+  <!-- End-stone ground at bottom -->
+  <rect y="760" width="1920" height="320" fill="url(#endstone)"/>
+  <rect y="744" width="1920" height="22" fill="#cfc774" fill-opacity="0.10"/>
+
+  <!-- Depth vignette -->
+  <rect width="1920" height="1080" fill="#000000" fill-opacity="0.10"/>
+</svg>
