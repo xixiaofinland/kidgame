@@ -6,6 +6,7 @@ const AUDIO_KEY = "pottu_dash_audio_v1";
 const els = {
   toast: document.getElementById("toast"),
 
+  gameArea: document.getElementById("gameArea"),
   canvas: document.getElementById("gameCanvas"),
   overlay: document.getElementById("gameOverlay"),
   overlayTitle: document.getElementById("overlayTitle"),
@@ -17,6 +18,7 @@ const els = {
   jumpBtn: document.getElementById("jumpBtn"),
   resetBestBtn: document.getElementById("resetBestBtn"),
   audioBtn: document.getElementById("audioBtn"),
+  fullscreenBtn: document.getElementById("fullscreenBtn"),
 
   score: document.getElementById("score"),
   best: document.getElementById("best"),
@@ -839,6 +841,61 @@ function createGame() {
         if (state.running) startMusic();
       });
     }
+
+    const isFs = () => {
+      return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+    };
+
+    const updateFsButton = () => {
+      if (!els.fullscreenBtn) return;
+      els.fullscreenBtn.textContent = isFs() ? "Poistu" : "Taysnaytto";
+    };
+
+    const exitFs = async () => {
+      try {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } catch {
+        /* ignore */
+      }
+    };
+
+    const requestFs = async () => {
+      const el = els.gameArea || els.canvas;
+      if (!el) return;
+      try {
+        if (el.requestFullscreen) await el.requestFullscreen({ navigationUI: "hide" });
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else showToast("Taysnaytto ei toimi tassa selaimessa");
+      } catch {
+        showToast("Taysnaytto ei toimi tassa selaimessa");
+      }
+    };
+
+    if (els.fullscreenBtn) {
+      updateFsButton();
+      els.fullscreenBtn.addEventListener("click", async () => {
+        if (isFs()) await exitFs();
+        else await requestFs();
+        window.setTimeout(() => {
+          resize();
+          updateFsButton();
+        }, 80);
+      });
+    }
+
+    document.addEventListener("fullscreenchange", () => {
+      updateFsButton();
+      window.setTimeout(() => {
+        resize();
+      }, 60);
+    });
+    document.addEventListener("webkitfullscreenchange", () => {
+      updateFsButton();
+      window.setTimeout(() => {
+        resize();
+      }, 60);
+    });
 
     if (els.overlay) {
       els.overlay.addEventListener("pointerdown", (e) => {
