@@ -107,6 +107,9 @@ function createGame() {
     dpr: 1,
     unit: 24,
 
+    prevW: 0,
+    prevH: 0,
+
     speed: 430,
     speedMax: 980,
     speedRamp: 16,
@@ -330,6 +333,9 @@ function createGame() {
     const cssH = Math.max(1, Math.floor(rect.height));
     const dpr = Math.min(2, window.devicePixelRatio || 1);
 
+    const prevW = state.w;
+    const prevH = state.h;
+
     canvas.width = Math.floor(cssW * dpr);
     canvas.height = Math.floor(cssH * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -353,6 +359,18 @@ function createGame() {
 
     player.x = Math.floor(state.w * 0.18);
     player.y = state.floorY - player.h;
+
+    // If the viewport changes a lot (fullscreen / rotation), old obstacles would float.
+    // Clear them so the run stays consistent.
+    const majorResize = (prevW && prevH) && (Math.abs(prevW - state.w) > 140 || Math.abs(prevH - state.h) > 140);
+    if (majorResize) {
+      state.obstacles = [];
+      state.nextSpawn = Math.max(state.nextSpawn, 0.55);
+      state.chain = 0;
+      state.doubleCooldown = 0;
+      state.tallCooldown = 0;
+      state.lastWasDouble = false;
+    }
 
     renderBgCacheFn();
   }
@@ -465,6 +483,7 @@ function createGame() {
     const typeRoll = Math.random();
 
     const jumpH = (state.jumpV * state.jumpV) / (2 * state.gravity);
+    const maxSingle = Math.max(base * 2, Math.floor(jumpH * 0.92));
 
     const isBlock = typeRoll > 0.74;
     let w = base * 2;
@@ -473,25 +492,31 @@ function createGame() {
     if (isBlock) {
       // Sometimes spawn a "needs double jump" tower.
       const canTower = state.tallCooldown === 0 && state.chain < 4;
-      const makeTower = canTower && Math.random() < 0.34;
+      const makeTower = canTower && Math.random() < 0.42;
       if (makeTower) {
-        // Guaranteed: one jump cannot clear (height > jumpH), but double jump can.
-        const towerH = Math.floor(jumpH * (1.22 + Math.random() * 0.33));
-        height = Math.min(floorY - 10, Math.max(base * 4, towerH));
-        w = Math.floor(base * 2.6);
+        // Guaranteed: one jump cannot clear (height > jumpH), but double jump can (height < 2*jumpH).
+        const minH = Math.floor(jumpH * 1.20);
+        const maxH = Math.floor(jumpH * 1.68);
+        const span = Math.max(1, maxH - minH);
+        height = minH + Math.floor(Math.random() * span);
+        height = Math.min(floorY - 12, height);
+        w = Math.floor(base * 2.4);
       } else {
         // Normal blocks.
         const r = Math.random();
-        const mul = (r < 0.46) ? 2 : (r < 0.78) ? 3 : (r < 0.93) ? 4 : 5;
-        height = Math.min(floorY - 10, base * mul);
-        if (mul >= 4) w = Math.floor(base * 2.5);
+        const mul = (r < 0.52) ? 2 : (r < 0.84) ? 3 : 4;
+        height = Math.min(floorY - 12, base * mul);
+        // Keep normal blocks single-jumpable.
+        height = Math.min(height, maxSingle);
+        if (mul >= 3) w = Math.floor(base * 2.35);
       }
     } else {
       // Spikes are usually small, sometimes tall.
       const r = Math.random();
-      const mul = (r < 0.86) ? 2 : (r < 0.97) ? 3 : 4;
-      height = Math.min(floorY - 10, base * mul);
-      if (mul >= 3) w = Math.floor(base * 2.3);
+      const mul = (r < 0.90) ? 2 : 3;
+      height = Math.min(floorY - 12, base * mul);
+      height = Math.min(height, maxSingle);
+      if (mul >= 3) w = Math.floor(base * 2.2);
     }
 
     const obs = {
@@ -503,7 +528,7 @@ function createGame() {
     };
 
     // If obstacle is higher than one-jump height, it needs double-jump.
-    const needsDouble = height > jumpH * 1.06;
+    const needsDouble = height > jumpH * 1.02;
     const canDouble = !isBlock && !needsDouble && state.doubleCooldown === 0 && state.chain < 2;
     const makeDouble = canDouble && Math.random() > 0.84;
     if (makeDouble) {
