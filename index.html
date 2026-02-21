@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0f1a" />
+    <meta name="description" content="Pottu - Minecraft & Roblox - pelimainen linkkisivu." />
+
+    <title>Pottu</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <main class="wrap" aria-label="Pottu-sivu">
+      <header class="hero">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 96 96" role="img" focusable="false">
+            <defs>
+              <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#7cf29a" />
+                <stop offset="1" stop-color="#5dd6ff" />
+              </linearGradient>
+            </defs>
+            <rect x="10" y="10" width="76" height="76" rx="14" fill="url(#g)" opacity="0.16" />
+            <path
+              d="M27 72V24h28c9 0 14 5 14 14v2c0 9-5 14-14 14H41v18H27Zm14-30h12c3 0 4-1 4-4v-2c0-3-1-4-4-4H41v10Z"
+              fill="#e9f6ff"
+            />
+            <path
+              d="M19 28h6v6h-6v-6Zm0 34h6v6h-6v-6Zm52-34h6v6h-6v-6Zm0 34h6v6h-6v-6Z"
+              fill="#e9f6ff"
+              opacity="0.7"
+            />
+          </svg>
+        </div>
+
+        <h1 class="title">Pottu</h1>
+        <p class="tagline">Minecraft &amp; Roblox — pelimainen linkkisivu</p>
+
+        <div class="chips" aria-label="Aiheet">
+          <span class="chip">Minecraft</span>
+          <span class="chip">Roblox</span>
+          <span class="chip">Projekti</span>
+        </div>
+      </header>
+
+      <section class="panel" aria-label="Pojat">
+        <div class="cards">
+          <article class="card" aria-label="Isoveli">
+            <div class="cardTop">
+              <div class="avatar" aria-hidden="true">11</div>
+              <div>
+                <h2 class="cardTitle">Isoveli</h2>
+                <p class="cardMeta">11 v</p>
+              </div>
+            </div>
+            <p class="cardText">Tykkää rakentaa, selviytyä ja testata uusia juttuja.</p>
+            <div class="cardTags" aria-label="Tagit">
+              <span class="pill">Redstone</span>
+              <span class="pill">Obby</span>
+              <span class="pill">Speedrun</span>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Pikkuveli">
+            <div class="cardTop">
+              <div class="avatar" aria-hidden="true">9</div>
+              <div>
+                <h2 class="cardTitle">Pikkuveli</h2>
+                <p class="cardMeta">9 v</p>
+              </div>
+            </div>
+            <p class="cardText">Tykkää seikkailla, kerätä tavaroita ja pelata kavereiden kanssa.</p>
+            <div class="cardTags" aria-label="Tagit">
+              <span class="pill">Parkour</span>
+              <span class="pill">Tycoon</span>
+              <span class="pill">Co-op</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Linkit">
+        <h2 class="sectionTitle">Linkit</h2>
+
+        <nav class="links" aria-label="Pottu-linkit">
+          <a class="btn" href="#" data-coming-soon="Roblox-profiilit lisätään myöhemmin">
+            <span class="btnIcon" aria-hidden="true">R</span>
+            <span class="btnText">Roblox (tulossa)</span>
+          </a>
+          <a class="btn" href="#" data-coming-soon="Minecraft-jutut tulossa (serveri/screenshotit)">
+            <span class="btnIcon" aria-hidden="true">M</span>
+            <span class="btnText">Minecraft (tulossa)</span>
+          </a>
+          <a class="btn" href="#" data-coming-soon="YouTube/Shortsit voidaan linkata tähän">
+            <span class="btnIcon" aria-hidden="true">Y</span>
+            <span class="btnText">YouTube (tulossa)</span>
+          </a>
+          <a class="btn" href="#" data-coming-soon="Discord-linkki voidaan lisätä myöhemmin">
+            <span class="btnIcon" aria-hidden="true">D</span>
+            <span class="btnText">Discord (tulossa)</span>
+          </a>
+        </nav>
+
+        <p class="fineprint">
+          Vinkki: vaihda linkit suoraan tiedostosta <code>index.html</code> (etsi “tulossa”).
+        </p>
+      </section>
+
+      <section class="panel game" aria-label="Hyppelypeli">
+        <div class="gameHead">
+          <h2 class="sectionTitle">Hyppelypeli</h2>
+          <div class="hudStats" aria-label="Pistetilasto">
+            <div class="hudStat" aria-label="Pisteet">
+              <span class="hudLabel">Pisteet</span>
+              <span class="hudValue" id="score">0</span>
+            </div>
+            <div class="hudStat" aria-label="Paras">
+              <span class="hudLabel">Paras</span>
+              <span class="hudValue" id="best">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gameArea" aria-label="Peli">
+          <canvas id="gameCanvas" class="gameCanvas" width="960" height="540"></canvas>
+
+          <div class="gameOverlay" id="gameOverlay">
+            <div class="overlayCard" role="group" aria-label="Pelin aloitus">
+              <p class="overlayTitle" id="overlayTitle">Pottu Dash</p>
+              <p class="overlayText" id="overlayText">Hyppy: klikkaa / koske / välilyönti</p>
+              <div class="overlayButtons">
+                <button class="big" id="startBtn" type="button">Pelaa</button>
+                <button class="ghost" id="restartBtn" type="button">Uudestaan</button>
+              </div>
+              <p class="overlayHint" id="overlayHint">Vinkki: pidempi putki = enemmän pisteitä.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="gameButtons" aria-label="Ohjaimet">
+          <button class="big jumpBtn" id="jumpBtn" type="button">HYPPY</button>
+          <button class="ghost" id="resetBestBtn" type="button">Nollaa paras</button>
+        </div>
+
+        <div class="audioRow" aria-label="Aani">
+          <button class="ghost" id="audioBtn" type="button">Aani: PÄÄLLÄ</button>
+          <span class="audioHint">Musiikki kaynnistyy kun painat Pelaa.</span>
+        </div>
+
+        <p class="fineprint">Mobiilissa voit napauttaa pelialuetta tai painaa HYPPY.</p>
+      </section>
+
+      <footer class="footer" aria-label="Alatunniste">
+        <div class="footerLine"></div>
+        <p>
+          Tehty: <span class="mono">Pottu</span> — staattinen sivu, toimii paikallisesti ja GitHub Pagesissa.
+        </p>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
