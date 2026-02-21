@@ -335,6 +335,7 @@ function createGame() {
 
     const prevW = state.w;
     const prevH = state.h;
+    const prevUnit = state.unit;
 
     canvas.width = Math.floor(cssW * dpr);
     canvas.height = Math.floor(cssH * dpr);
@@ -360,16 +361,16 @@ function createGame() {
     player.x = Math.floor(state.w * 0.18);
     player.y = state.floorY - player.h;
 
-    // If the viewport changes a lot (fullscreen / rotation), old obstacles would float.
-    // Clear them so the run stays consistent.
-    const majorResize = (prevW && prevH) && (Math.abs(prevW - state.w) > 140 || Math.abs(prevH - state.h) > 140);
-    if (majorResize) {
-      state.obstacles = [];
-      state.nextSpawn = Math.max(state.nextSpawn, 0.55);
-      state.chain = 0;
-      state.doubleCooldown = 0;
-      state.tallCooldown = 0;
-      state.lastWasDouble = false;
+    // Keep existing obstacles pinned to the new floor after resize (e.g. fullscreen).
+    if (prevW && prevH && state.obstacles.length > 0) {
+      const sx = state.w / prevW;
+      const su = prevUnit > 0 ? (state.unit / prevUnit) : 1;
+      for (const o of state.obstacles) {
+        o.x *= sx;
+        o.w = Math.max(8, o.w * su);
+        o.h = Math.max(8, o.h * su);
+        o.y = state.floorY - o.h;
+      }
     }
 
     renderBgCacheFn();
