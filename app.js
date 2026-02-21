@@ -105,6 +105,7 @@ function createGame() {
     w: 960,
     h: 540,
     dpr: 1,
+    unit: 24,
 
     speed: 430,
     speedMax: 980,
@@ -336,6 +337,12 @@ function createGame() {
     state.w = cssW;
     state.h = cssH;
     state.dpr = dpr;
+
+    // Scale world unit by canvas height (keeps fullscreen proportions sane).
+    state.unit = Math.max(18, Math.min(46, Math.floor(state.h * 0.045)));
+    const p = Math.max(28, Math.min(72, Math.floor(state.unit * 1.5)));
+    player.w = p;
+    player.h = p;
     state.floorH = Math.max(92, Math.floor(state.h * 0.18));
     state.floorY = state.h - state.floorH;
 
@@ -453,9 +460,8 @@ function createGame() {
   }
 
   function spawnObstacle() {
-    const h = state.h;
     const floorY = state.floorY;
-    const base = Math.max(18, Math.floor(h * 0.06));
+    const base = state.unit;
     const typeRoll = Math.random();
 
     const jumpH = (state.jumpV * state.jumpV) / (2 * state.gravity);
@@ -721,9 +727,19 @@ function createGame() {
     ctx.strokeRect(player.x + 1.5, player.y + 1.5, player.w - 3, player.h - 3);
 
     ctx.fillStyle = "rgba(6, 8, 19, 0.75)";
-    ctx.fillRect(player.x + 10, player.y + 12, 5, 5);
-    ctx.fillRect(player.x + 22, player.y + 12, 5, 5);
-    ctx.fillRect(player.x + 14, player.y + 23, 10, 4);
+    {
+      const eye = Math.max(3, Math.floor(player.w * 0.14));
+      const eyeY = Math.floor(player.h * 0.32);
+      const eyeX1 = Math.floor(player.w * 0.28);
+      const eyeX2 = Math.floor(player.w * 0.62);
+      const mouthW = Math.max(8, Math.floor(player.w * 0.28));
+      const mouthH = Math.max(3, Math.floor(player.h * 0.11));
+      const mouthX = Math.floor((player.w - mouthW) / 2);
+      const mouthY = Math.floor(player.h * 0.64);
+      ctx.fillRect(player.x + eyeX1, player.y + eyeY, eye, eye);
+      ctx.fillRect(player.x + eyeX2, player.y + eyeY, eye, eye);
+      ctx.fillRect(player.x + mouthX, player.y + mouthY, mouthW, mouthH);
+    }
 
     ctx.restore();
   }
